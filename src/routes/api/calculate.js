@@ -16,7 +16,7 @@ export async function load({ request, resolve }) {
   }
   
  
-  function calculates(userInput) {
+  function calculate(userInput) {
   
     try {
       const result = eval(userInput);
