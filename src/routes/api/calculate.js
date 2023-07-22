@@ -12,13 +12,11 @@ export async function load({ request, resolve }) {
         }
       };
     }
-  
-  
     return await resolve(request);
   }
   
  
-  function customCalculate(userInput) {
+  function calculates(userInput) {
   
     try {
       const result = eval(userInput);

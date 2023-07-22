@@ -10,6 +10,7 @@
 
   let userInput = "";
   let result = null;
+  let resultMessage = "walang kwenta";
 
   async function calculate() {
     try {
@@ -52,7 +53,11 @@
 </script>
 
 <div class="container">
-  {result}
+  {#if result !== null}
+    {result}
+  {:else}
+    {resultMessage}
+  {/if}
   <div class="calcu">
     <input type="text" bind:value={userInput} readonly />
     <section>
