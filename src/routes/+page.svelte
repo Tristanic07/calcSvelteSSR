@@ -1,5 +1,4 @@
 <script>
-  import { onMount } from "svelte";
   const calcButtons = [
     ["C", "+ -", "%", "/"],
     ["7", "8", "9", "x"],
@@ -8,58 +7,54 @@
     ["0", ".", "="],
   ].flat();
 
-  let userInput = "";
+  let userInput = " ";
   let result = null;
-  let resultMessage = "walang kwenta";
+  $: displayValue = result === null ? userInput : result;
 
   async function calculate() {
-    try {
-      const response = await fetch("/api/calculate", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ userInput }),
-      });
+    const response = await fetch("/api/calculate", {
+      method: "POST",
+      body: JSON.stringify({ userInput }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
 
-      const data = await response.json();
-      result = data.result;
-    } catch (error) {
-      console.error("Error:", error);
-      result = "Error calculating";
-    }
+    result = await response.json();
+    console.log(result);
   }
 
   function handleButtonClick(button) {
-    if (button === "=") {
-      calculate();
-    } else if (button === "C") {
-      userInput = "";
-      result = null;
-    } else {
-      userInput += button;
-    }
-    console.log(userInput);
-  }
+    switch (button) {
+      case "C":
+        userInput = " ";
+        break;
 
-  onMount(() => {
-    document.querySelectorAll(".button").forEach((button) => {
-      button.addEventListener("click", () => {
-        const buttonText = button.innerText;
-        handleButtonClick(buttonText);
-      });
-    });
-  });
+      case "+ -":
+        userInput *= -1;
+        break;
+
+      case ".":
+        break;
+
+      case "%":
+        userInput *= 0.1;
+        break;
+
+      case "=":
+        calculate();
+        break;
+
+      default:
+        userInput += button;
+        break;
+    }
+  }
 </script>
 
 <div class="container">
-  {#if result !== null}
-    {result}
-  {:else}
-    {resultMessage}
-  {/if}
   <div class="calcu">
-    <input type="text" bind:value={userInput} readonly />
+    <input type="text" bind:value={displayValue} readonly />
     <section>
       {#each calcButtons as buttons}
         {#if buttons === "="}
