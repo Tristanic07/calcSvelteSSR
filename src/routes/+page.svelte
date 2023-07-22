@@ -1,60 +1,76 @@
 <script>
   const calcButtons = [
     ["C", "+ -", "%", "/"],
-    ["7", "8", "9", "x"],
+    ["7", "8", "9", "*"],
     ["4", "5", "6", "-"],
     ["1", "2", "3", "+"],
     ["0", ".", "="],
   ].flat();
 
-  let userInput = " ";
-  let result = null;
-  $: displayValue = result === null ? userInput : result;
+  let userInput = "0";
 
   async function calculate() {
-    const response = await fetch("/api/calculate", {
-      method: "POST",
-      body: JSON.stringify({ userInput }),
-      headers: {
-        "content-type": "application/json",
-      },
-    });
+    try {
+      const response = await fetch("/api/calculate", {
+        method: "POST",
+        body: JSON.stringify({ userInput }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
 
-    result = await response.json();
-    console.log(result);
+      const data = await response.json();
+      userInput = data.result;
+      console.log("result:", result);
+    } catch {
+      console.error("Error:", error);
+      result = "Error calculating";
+    }
   }
 
   function handleButtonClick(button) {
-    switch (button) {
-      case "C":
-        userInput = " ";
-        break;
+    if (!isNaN(button)) {
+      userInput = userInput == 0 ? button : userInput + button;
+    } else {
+      switch (button) {
+        case "C":
+          userInput = "0";
+          break;
 
-      case "+ -":
-        userInput *= -1;
-        break;
+        case "+ -":
+          userInput *= -1;
+          break;
 
-      case ".":
-        break;
+        case ".":
+          break;
 
-      case "%":
-        userInput *= 0.1;
-        break;
+        case "%":
+          userInput *= 0.1;
+          break;
 
-      case "=":
-        calculate();
-        break;
+        case "=":
+          calculate();
+          break;
 
-      default:
-        userInput += button;
-        break;
+        default:
+          const lastChar = userInput[userInput.length - 1];
+          const isOperator = /[*/+\-]/.test(lastChar);
+
+          // If the last character is an operator and the clicked button is also an operator, replace the last operator with the new one
+          if (isOperator && /[*/+\-]/.test(button)) {
+            userInput = userInput.slice(0, -1) + button;
+          } else {
+            userInput += button;
+          }
+          break;
+      }
     }
   }
 </script>
 
 <div class="container">
   <div class="calcu">
-    <input type="text" bind:value={displayValue} readonly />
+    <input type="text" bind:value={userInput} readonly />
     <section>
       {#each calcButtons as buttons}
         {#if buttons === "="}
