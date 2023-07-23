@@ -20,14 +20,12 @@
           "content-type": "application/json",
         },
       });
-
       const data = await response.json(); //revcieving data from server
       userInput = data.result;
-      console.log("result:", result);
     } catch {
       // catch error
-      console.error("Error:", error);
-      result = "Error calculating";
+      console.error("Error:");
+      userInput = "Error calculating";
     }
   }
 
@@ -44,9 +42,6 @@
           userInput *= -1;
           break;
 
-        case ".":
-          break;
-
         case "%":
           userInput *= 0.1;
           break;
@@ -57,9 +52,9 @@
 
         default:
           const lastChar = userInput[userInput.length - 1];
-          const isOperator = /[*/+\-]/.test(lastChar);
+          const isOperator = /[*/+\-.]/.test(lastChar);
 
-          //checking if the last input is operator
+          //checking if the last input is operator or period
           if (isOperator) {
             userInput = userInput.slice(0, -1) + button;
           } else {
