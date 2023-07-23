@@ -11,18 +11,21 @@
 
   async function calculate() {
     try {
+      // will try to run the code block
       const response = await fetch("/api/calculate", {
+        // making request to server using fetch
         method: "POST",
-        body: JSON.stringify({ userInput }),
+        body: JSON.stringify({ userInput }), //making a json representation of userInput
         headers: {
           "content-type": "application/json",
         },
       });
 
-      const data = await response.json();
+      const data = await response.json(); //revcieving data from server
       userInput = data.result;
       console.log("result:", result);
     } catch {
+      // catch error
       console.error("Error:", error);
       result = "Error calculating";
     }
@@ -49,15 +52,15 @@
           break;
 
         case "=":
-          calculate();
+          calculate(); // running the async function when click
           break;
 
         default:
           const lastChar = userInput[userInput.length - 1];
           const isOperator = /[*/+\-]/.test(lastChar);
 
-          // If the last character is an operator and the clicked button is also an operator, replace the last operator with the new one
-          if (isOperator && /[*/+\-]/.test(button)) {
+          //checking if the last input is operator
+          if (isOperator) {
             userInput = userInput.slice(0, -1) + button;
           } else {
             userInput += button;
